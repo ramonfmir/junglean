@@ -53,6 +53,5 @@ def readLines (path : String) : IO (List String) := do
   let content ← handle.readToEnd
   return (content.splitOn "\n")
 
--- NOTE: This doesn't really time anything.
 def time (f : α → β) (x : α) : IO β := do 
   timeit "Execution time: " (return f x)
