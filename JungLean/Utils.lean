@@ -54,5 +54,5 @@ def readLines (path : String) : IO (List String) := do
   return (content.splitOn "\n")
 
 -- NOTE: This doesn't really time anything.
-def time (f : α → β) (x : α) : IO Unit := do 
-  timeit "Execution time: " (do let fx := f x)
+def time (f : α → β) (x : α) : IO β := do 
+  timeit "Execution time: " (return f x)
