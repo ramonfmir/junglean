@@ -1,6 +1,6 @@
 import Lake
 open Lake DSL
 
-package junglean {
+package JungLean {
   -- add configuration options here
 }

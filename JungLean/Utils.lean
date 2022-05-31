@@ -52,7 +52,7 @@ def insert (compare : α → α → Bool) (x : α) (l : List α) : (List α) :=
   | h :: t => if compare x h then x :: h :: t else h :: insert compare x t
 
 -- TODO better sorting algo
-def sort (compare : α → α → Bool) (l : List α) : (List α) :=
+def List.sort (compare : α → α → Bool) (l : List α) : (List α) :=
   let rec loop : List α → List α → List α
     | acc, [] => acc
     | acc, h :: t => loop (insert compare h acc) t
@@ -63,7 +63,13 @@ end List
 def readLines (path : String) : IO (List String) := do
   let handle ← IO.FS.Handle.mk path IO.FS.Mode.read
   let content ← handle.readToEnd
-  return (content.splitOn "\n")
+  return content.trim.splitOn "\n"
 
 def time (f : α → β) (x : α) : IO β := do
   timeit "Execution time: " (return f x)
+
+def Float.toInt (f : Float) : Int :=
+  if f < 0 then
+    - (-f).toUInt64.val
+  else
+    f.toUInt64.val
