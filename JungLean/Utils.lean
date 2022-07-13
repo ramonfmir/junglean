@@ -73,3 +73,9 @@ def Float.toInt (f : Float) : Int :=
     - (-f).toUInt64.val
   else
     f.toUInt64.val
+
+def evalList {α} (l : List (IO α)) : IO (List α) := do
+  let mut ll := []
+  for x in l do
+    ll := (← x) :: ll
+  return ll

@@ -21,7 +21,7 @@ def splitImpur (impur : List α -> Float) (x_labels : List (Float × α)) (thr :
       let (x, l) := x_l
       if x < thr then (l :: left, right) else (left, l :: right)
   let (left, right) := List.foldl append ([], []) x_labels
-  ((impur left) + (impur right)) / 2.0
+  ((impur left) + (impur right)) / 2
 
 def bestSplit (impur : List α -> Float) (x : List Float) (labels : List α) : Float × Float :=
     let x_l := List.zip x labels

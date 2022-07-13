@@ -12,20 +12,22 @@ inductive Tree where
   | node : SplitRule → Tree → Tree → Tree
   | leaf : IO String → Tree
 
-def tree max_depth (rule : Examples → Array Float → Bool) examples :=
-  let rec loop examples depth :=
+def tree (max_depth : Nat) (rule : Examples → IO (Array Float → Bool)) (examples : IO Examples) : IO Tree := do
+  let examples ← examples
+  let rec loop examples depth := do
     match depth, (uniformLabels examples) with
-    | _, true  => Tree.leaf (randomLabel examples)
-    | 0, _     => Tree.leaf (randomLabel examples)
+    | _, true  => return (Tree.leaf (randomLabel examples))
+    | 0, _     => return Tree.leaf (randomLabel examples)
     | d + 1, _ =>
-      let split := split (rule examples)
-      let (examples_l, examples_r) := split examples
+      let rule := ← (rule examples)
+      let (examples_l, examples_r) := split rule examples
       if isEmpty examples_l || isEmpty examples_r
-      then Tree.leaf (randomLabel examples)
-      else Tree.node split (loop examples_l d) (loop examples_r d)
+      then return Tree.leaf (randomLabel examples)
+      else return Tree.node (split rule) (← loop examples_l d) (← loop examples_r d)
   loop examples max_depth
 
-def classify (examples : Examples) (tree : Tree) :=
+def Tree.classify (examples : Examples) (tree : IO Tree) : IO (List String) := do
+  let tree ← tree
   let rec loop tree examples :=
     match tree with
     | Tree.leaf c =>
@@ -36,4 +38,5 @@ def classify (examples : Examples) (tree : Tree) :=
   let inds_labels := loop tree examples
   let inds := indices examples
   let tbl := inds_labels.foldl (fun t (a, b) => t.insert a b) HashMap.empty
-  List.map (fun i => (tbl.find! i)) inds
+  let l := List.map (fun i => (tbl.find! i)) inds
+  evalList l

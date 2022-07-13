@@ -70,7 +70,7 @@ def randomThr (l : List Float) : IO Float := do
 #eval randomThr (colToList 1 x)
 
 def randomRule (examples : Examples) : IO (Example → Bool) := do
-  let n := (← IO.rand 0 (nFeatures examples))
+  let n := ← IO.rand 0 (nFeatures examples)
   let col := colToList n examples
   let thr := ← randomThr col
   return (fun e => e[n] < thr)
