@@ -2,10 +2,11 @@ import JungLean.Data
 import JungLean.Tree
 import Std.Data.HashMap
 
-def forest (tree : IO Examples → IO Tree) (n : Nat) (examples : IO Examples) : IO (List (IO Tree)) := do
+def forest (tree : IO Examples → IO Tree) (n : Nat) (examples : IO Examples) : IO (List Tree) := do
   let initseg := List.range n
   let examples ← examples
-  return List.map (fun i => tree (randomSubset examples)) initseg
+  let forest := List.map (fun i => tree (randomSubset examples)) initseg
+  evalList forest
 
 open Std
 
@@ -26,12 +27,11 @@ def vote (votes : List String) : IO String := do
   | ([x], _) => return x
   | (l, _) => return (← chooseRandom l)
 
-
-def classify (forest : IO (List (IO Tree))) (examples : IO Examples) : IO (List (IO String)) := do
+def classify (forest : IO (List Tree)) (examples : IO Examples) : IO (List String) := do
   let examples ← examples
   let forest ← forest
   let votes := List.map (Tree.classify examples) forest
   let votes ← evalList votes
   let inds := indices examples
   let voted i := (vote (List.map (fun x => List.get! x i) votes))
-  return List.map voted inds
+  evalList (List.map voted inds)

@@ -26,8 +26,7 @@ def tree (max_depth : Nat) (rule : Examples → IO (Array Float → Bool)) (exam
       else return Tree.node (split rule) (← loop examples_l d) (← loop examples_r d)
   loop examples max_depth
 
-def Tree.classify (examples : Examples) (tree : IO Tree) : IO (List String) := do
-  let tree ← tree
+def Tree.classify (examples : Examples) (tree : Tree) : IO (List String) := do
   let rec loop tree examples :=
     match tree with
     | Tree.leaf c =>

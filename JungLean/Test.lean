@@ -16,14 +16,8 @@ def my_trained_tree := tree 10 giniRule train_data
 def my_labels := classify my_forest train_data
 #check my_labels
 
-def length_my_list (l : IO (List (IO String))) : IO Nat := do
-  let ll := (← l).length
-  return ll
-
-def print_my_list (l : IO (List (IO String))) : IO Unit := do
-  for i in (← l) do
-    IO.println (← i)
-  return
+def length_my_list (l : IO (List String)) : IO Nat := do
+  return (← l).length
 
 #eval length_my_list my_labels
-#eval print_my_list my_labels
+#eval my_labels
