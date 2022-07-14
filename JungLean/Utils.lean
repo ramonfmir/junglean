@@ -89,8 +89,7 @@ def dedup (l : List β) : List β :=
   set.toList
 
 def floatOfString (s : String) : Float :=
-  let (s, sign) :=
-  if s.get 0 = '-'
+  let (s, sign) := if s.get 0 = '-'
     then ((s.toSubstring.drop 1).toString, -1)
     else (s, 1)
   let a := Array.mk (s.splitOn ".")
@@ -99,13 +98,3 @@ def floatOfString (s : String) : Float :=
   let S := Float.ofInt S.toInt!
   let s := Float.ofInt s.toInt!
   sign * (S + (s / 10 ^ length_s))
-
-#eval floatOfString "-123.456"
-#eval floatOfString "123.456"
-#eval floatOfString "123.4569999"
-#eval floatOfString "123.000"
-#eval floatOfString "-123.000"
-#eval floatOfString "123"
-#eval floatOfString "0.123"
-#eval floatOfString "-0.123"
-
