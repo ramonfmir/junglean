@@ -3,6 +3,7 @@ https://github.com/BartoszPiotrowski/random-forest/blob/main/src/utils.ml
 -/
 
 import Init.Data.Random
+import Std.Data.HashSet
 
 section List
 
@@ -78,4 +79,33 @@ def evalList {α} (l : List (IO α)) : IO (List α) := do
   let mut ll := []
   for x in l do
     ll := (← x) :: ll
-  return ll
+  return ll.reverse
+
+variable {β : Type u} [BEq β] [Hashable β]
+
+def dedup (l : List β) : List β :=
+  let empty_set := Std.HashSet.empty
+  let set := List.foldl Std.HashSet.insert empty_set l
+  set.toList
+
+def floatOfString (s : String) : Float :=
+  let (s, sign) :=
+  if s.get 0 = '-'
+    then ((s.toSubstring.drop 1).toString, -1)
+    else (s, 1)
+  let a := Array.mk (s.splitOn ".")
+  let (S, s) := (a[0],a[1])
+  let length_s := Float.ofInt s.length
+  let S := Float.ofInt S.toInt!
+  let s := Float.ofInt s.toInt!
+  sign * (S + (s / 10 ^ length_s))
+
+#eval floatOfString "-123.456"
+#eval floatOfString "123.456"
+#eval floatOfString "123.4569999"
+#eval floatOfString "123.000"
+#eval floatOfString "-123.000"
+#eval floatOfString "123"
+#eval floatOfString "0.123"
+#eval floatOfString "-0.123"
+

@@ -11,32 +11,15 @@ structure Examples where
   features : Features
   labels : Labels
 
-def x := Examples.mk
-[0,2]
-#[
-  #[1,2,3],
-  #[4,5,6],
-  #[7,8,9]
-]
-#["a", "b", "c"]
-
--- TODO read Floats from Strings, not via Int's like now
 def loadFeatures (path : String) : IO (Array (Array Float)) := do
   let lines ← readLines path
-  let readLine l := (l.splitOn ",").map (Float.ofInt ∘ String.toInt!)
+  let readLine l := (l.splitOn ",").map floatOfString
   let lines := List.map readLine lines
   return Array.mk (List.map Array.mk lines)
-
-#eval loadFeatures "tmp/a"
-#check loadFeatures "tmp/a"
 
 def loadLabels (path : String) : IO (Array String) := do
   let lines ← readLines path
   return Array.mk lines
-
-#eval loadLabels "tmp/b"
-#eval IO.println (1.0 + 1)
-#eval IO.print (1.0 + 1)
 
 def printExample (x : Examples) (i : Nat) : IO Unit := do
   let features := x.features[i]
@@ -44,17 +27,11 @@ def printExample (x : Examples) (i : Nat) : IO Unit := do
   for f in features do IO.print f; IO.print " "
   IO.println label
 
-#eval printExample x 0
-
 def nFeatures (x : Examples) : Nat :=
   Array.size x.features[0]
 
-#eval nFeatures x
-
 def colToList (n : Nat) (x : Examples) :=
   List.map (fun i => x.features[i][n]) x.indices
-
-#eval colToList 1 x
 
 --TODO labels as option
 def labels (x : Examples) : List String :=
@@ -66,13 +43,10 @@ def randomThr (l : List Float) : IO Float := do
   if (List.length l_no_min) = 0 then return l.get! 0
   else return l_no_min.get! (← IO.rand 0 (l_no_min.length - 1))
 
-#eval colToList 1 x
-#eval randomThr (colToList 1 x)
-
 def randomRule (examples : Examples) : IO (Example → Bool) := do
-  let n := ← IO.rand 0 (nFeatures examples)
+  let n ← IO.rand 0 (nFeatures examples - 1)
   let col := colToList n examples
-  let thr := ← randomThr col
+  let thr ← randomThr col
   return (fun e => e[n] < thr)
 
 def giniRule (examples : Examples) : IO (Example → Bool) := do

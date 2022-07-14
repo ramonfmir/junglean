@@ -10,6 +10,7 @@ def loadLabeled (labels : String) (features : String) : IO Examples := do
 def getLabels (examples : IO Examples) : IO (List String) := do
   let labels := (← examples).labels
   let indices := (← examples).indices
+  let indices := List.sort (fun a b => a < b) indices
   let labels := List.map (fun i => labels.get! i) indices
   return labels
 
@@ -32,7 +33,8 @@ def randomLabel (e : Examples) : IO String:= do
     return e.labels[i]
 
 def randomSubset (e : Examples) : IO Examples := do
-    let random_indices := ← sampleWithReplace e.indices (e.indices.length)
+    let random_indices_dup ← sampleWithReplace e.indices (e.indices.length)
+    let random_indices := dedup random_indices_dup
     return {e with indices := random_indices}
 
 def uniformLabels (e : Examples) : Bool :=
@@ -49,12 +51,8 @@ def split (rule : Array Float → Bool) (e : Examples) : (Examples × Examples) 
     match l with
     | [] => (inds_l, inds_r)
     | h :: t =>
-      --match (rule e.features[h]) with
-      --| False => loop inds_l (h :: inds_r) t
-      --| True  => loop (h :: inds_l) inds_r t -- redundant alternative ??
-      if (rule e.features[h])
-      then loop inds_l (h :: inds_r) t
-      else loop (h :: inds_l) inds_r t
+      match (rule e.features[h]) with
+      | false => loop inds_l (h :: inds_r) t
+      | true  => loop (h :: inds_l) inds_r t
   let (inds_l, inds_r) := loop [] [] e.indices
-  ({indices := inds_l, features := e.features, labels := e.labels},
-   {indices := inds_r, features := e.features, labels := e.labels})
+  ({e with indices := inds_l}, {e with indices := inds_r})

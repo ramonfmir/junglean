@@ -30,12 +30,11 @@ def Tree.classify (examples : Examples) (tree : Tree) : IO (List String) := do
   let rec loop tree examples :=
     match tree with
     | Tree.leaf c =>
-      List.map (fun i => (i, c)) (indices examples)
+        List.map (fun i => (i, c)) (indices examples)
     | Tree.node split_rule tree_l tree_r =>
-      let (examples_l, examples_r) := split_rule examples
-      (loop tree_l examples_l) ++ (loop tree_r examples_r)
+        let (examples_l, examples_r) := split_rule examples
+        (loop tree_l examples_l) ++ (loop tree_r examples_r)
   let inds_labels := loop tree examples
   let inds := indices examples
   let tbl := inds_labels.foldl (fun t (a, b) => t.insert a b) HashMap.empty
-  let l := List.map (fun i => (tbl.find! i)) inds
-  evalList l
+  evalList (List.map (fun i => (tbl.find! i)) inds)

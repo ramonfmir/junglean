@@ -3,9 +3,8 @@ import JungLean.Tree
 import Std.Data.HashMap
 
 def forest (tree : IO Examples → IO Tree) (n : Nat) (examples : IO Examples) : IO (List Tree) := do
-  let initseg := List.range n
   let examples ← examples
-  let forest := List.map (fun i => tree (randomSubset examples)) initseg
+  let forest := List.map (fun i => tree (randomSubset examples)) (List.range n)
   evalList forest
 
 open Std
@@ -35,3 +34,5 @@ def classify (forest : IO (List Tree)) (examples : IO Examples) : IO (List Strin
   let inds := indices examples
   let voted i := (vote (List.map (fun x => List.get! x i) votes))
   evalList (List.map voted inds)
+
+-- TODO make sure votes are in good order
